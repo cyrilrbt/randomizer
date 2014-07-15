@@ -18,12 +18,12 @@ class URLerHandler(randomizer.handler.Handler):
         # URLize shit
         n = random.choice(_worder.nouns)
         a = random.choice(_worder.adjs)
-        while True:
-            c = yield Link.objects.filter(noun=n).filter(adjective=a).find_all()
-            if len(c) > 0:
-                break
-            n = random.choice(_worder.nouns)
-            a = random.choice(_worder.adjs)
+        #while True:
+        #    c = yield Link.objects.filter(noun=n).filter(adjective=a).find_all()
+        #    if len(c) > 0:
+        #        break
+        #    n = random.choice(_worder.nouns)
+        #    a = random.choice(_worder.adjs)
 
         l = yield Link.objects.create(
             url=self.get_argument('url'),
