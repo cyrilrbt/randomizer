@@ -1,6 +1,5 @@
 import tornado
 import random
-from collections import defaultdict
 
 import randomizer.handler
 from randomizer.urler.models import Link
@@ -18,17 +17,18 @@ class URLerHandler(randomizer.handler.Handler):
         # URLize shit
         n = random.choice(_worder.nouns)
         a = random.choice(_worder.adjs)
-        #while True:
-        #    c = yield Link.objects.filter(noun=n).filter(adjective=a).find_all()
-        #    if len(c) > 0:
-        #        break
-        #    n = random.choice(_worder.nouns)
-        #    a = random.choice(_worder.adjs)
+        while True:
+            c = yield Link.objects.get(noun=n, adjective=a)
+            if c is None:
+                break
+            n = random.choice(_worder.nouns)
+            a = random.choice(_worder.adjs)
 
+        print a, n
         l = yield Link.objects.create(
             url=self.get_argument('url'),
             noun=n,
-            adjective=a
+            adjective=a,
         )
         context = {
             'awesome_url': l.link
@@ -54,13 +54,13 @@ class Worder:
         """
         assert word_type in ["adj", "noun"]
 
-        words = defaultdict(lambda: [])
+        words = []
 
         for l in open('/usr/share/wordnet/index.' + word_type):
             if l and not l.startswith(" "):
                 w = l.split()[0].strip()
                 if "_" not in w:
-                    words[l[0].lower()].append(w)
+                    words.append(w)
 
         return words
 
