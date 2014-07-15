@@ -15,25 +15,30 @@ class URLerHandler(randomizer.handler.Handler):
     @tornado.gen.coroutine
     def post(self):
         # URLize shit
-        n = random.choice(_worder.nouns)
-        a = random.choice(_worder.adjs)
-        while True:
-            c = yield Link.objects.get(noun=n, adjective=a)
-            if c is None:
-                break
+        l = yield Link.objects.get(url=self.get_argument('url'))
+        if not l:
             n = random.choice(_worder.nouns)
             a = random.choice(_worder.adjs)
+            while True:
+                c = yield Link.objects.get(noun=n, adjective=a)
+                if c is None:
+                    break
+                n = random.choice(_worder.nouns)
+                a = random.choice(_worder.adjs)
 
-        print a, n
-        l = yield Link.objects.create(
-            url=self.get_argument('url'),
-            noun=n,
-            adjective=a,
-        )
-        context = {
-            'awesome_url': l.link
-        }
-        self.render("urler/show.html", **context)
+            l = yield Link.objects.create(
+                url=self.get_argument('url'),
+                noun=n,
+                adjective=a,
+            )
+        self.redirect(self.reverse_url('urler_show', l._id))
+
+
+class ShowHandler(randomizer.handler.Handler):
+    @tornado.gen.coroutine
+    def get(self, id):
+        l = yield Link.objects.get(id=id)
+        self.render("urler/show.html", link=l)
 
 
 class RedirectHandler(randomizer.handler.Handler):
@@ -41,7 +46,7 @@ class RedirectHandler(randomizer.handler.Handler):
     def get(self, param):
         a, n = param.split('-')
         l = yield Link.objects.get(adjective=a, noun=n)
-        self.redirect(l.link)
+        self.redirect(l.url)
 
 
 class Worder:
@@ -56,10 +61,11 @@ class Worder:
 
         words = []
 
-        for l in open('/usr/share/wordnet/index.' + word_type):
+        #for l in open('/usr/share/wordnet/index.' + word_type):
+        for l in open('/usr/local/Cellar/wordnet/3.1/dict/index.' + word_type):
             if l and not l.startswith(" "):
                 w = l.split()[0].strip()
-                if "_" not in w:
+                if "_" not in w and "-" not in w:
                     words.append(w)
 
         return words
