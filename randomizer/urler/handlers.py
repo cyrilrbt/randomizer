@@ -1,3 +1,4 @@
+import tornado
 import random
 from collections import defaultdict
 
@@ -12,6 +13,7 @@ class URLerHandler(randomizer.handler.Handler):
         }
         self.render("urler/new.html", **context)
 
+    @tornado.gen.coroutine
     def post(self):
         # URLize shit
         n = random.choice(_worder.nouns)
@@ -28,7 +30,7 @@ class URLerHandler(randomizer.handler.Handler):
             noun=n,
             adjective=a
         )
-        l.save()
+        l = yield l.save()
         context = {
             'awesome_url': l.link
         }
@@ -36,6 +38,7 @@ class URLerHandler(randomizer.handler.Handler):
 
 
 class RedirectHandler(randomizer.handler.Handler):
+    @tornado.gen.coroutine
     def get(self, param):
         a, n = param.split('-')
         l = yield Link.objects.get(adjective=a, noun=n)
