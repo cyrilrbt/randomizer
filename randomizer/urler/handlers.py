@@ -14,8 +14,15 @@ class URLerHandler(randomizer.handler.Handler):
 
     def post(self):
         # URLize shit
-        print self.get_argument('url')
-        n, a = _worder.find_combo()
+        n = random.choice(_worder.nouns)
+        a = random.choice(_worder.adjs)
+        while True:
+            c = yield Link.objects.filter(noun=n, adjective=a).count()
+            if c > 0:
+                break
+            n = random.choice(self.nouns)
+            a = random.choice(self.adjs)
+
         l = Link(
             url=self.get_argument('url'),
             noun=n,
@@ -54,17 +61,5 @@ class Worder:
                     words[l[0].lower()].append(w)
 
         return words
-
-    def find_combo(self):
-        n = random.choice(self.nouns)
-        a = random.choice(self.adjs)
-        while True:
-            c = yield Link.objects.filter(noun=n, adjective=a).find_all()
-            if len(c) > 0:
-                break
-            n = random.choice(self.nouns)
-            a = random.choice(self.adjs)
-        return n, a
-
 
 _worder = Worder()
