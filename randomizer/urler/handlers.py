@@ -47,7 +47,7 @@ class Worder:
 
         words = defaultdict(lambda: [])
 
-        for l in open('/usr/local/Cellar/wordnet/3.1/dict/index.' + word_type):
+        for l in open('/usr/share/wordnet/index.' + word_type):
             if l and not l.startswith(" "):
                 w = l.split()[0].strip()
                 if "_" not in w:
@@ -58,7 +58,10 @@ class Worder:
     def find_combo(self):
         n = random.choice(self.nouns)
         a = random.choice(self.adjs)
-        while Link.objects.filter(noun=n, adjective=a).count() > 0:
+        while True:
+            c = yield Link.objects.filter(noun=n, adjective=a).find_all()
+            if len(c) > 0:
+                break
             n = random.choice(self.nouns)
             a = random.choice(self.adjs)
         return n, a
