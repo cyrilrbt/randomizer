@@ -19,18 +19,17 @@ class URLerHandler(randomizer.handler.Handler):
         n = random.choice(_worder.nouns)
         a = random.choice(_worder.adjs)
         while True:
-            c = yield Link.objects.filter(noun=n, adjective=a).count()
-            if c > 0:
+            c = yield Link.objects.filter(noun=n, adjective=a).find_all()
+            if len(c) > 0:
                 break
-            n = random.choice(self.nouns)
-            a = random.choice(self.adjs)
+            n = random.choice(_worder.nouns)
+            a = random.choice(_worder.adjs)
 
-        l = Link(
+        l = yield Link.objects.create(
             url=self.get_argument('url'),
             noun=n,
             adjective=a
         )
-        l = yield l.save()
         context = {
             'awesome_url': l.link
         }
