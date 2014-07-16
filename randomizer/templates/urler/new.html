@@ -1,10 +1,10 @@
 {% extends '../base.html' %}
 
 {% block content %}
-<h1>Enter URL plz</h1>
+<h1>It's like a url shortener, but not really.</h1>
 <form action="{{ reverse_url('urler_new')}}" method="post">
-  <input type="text" name="url" /><br />
-  <input type="submit" />
+  <input type="text" name="url" placeholder="paste a url here" /><br />
+  <input type="submit" value="urlify" />
   {{ xsrf_form_html() }}
 </form>
 {% end %}
