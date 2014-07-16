@@ -15,7 +15,10 @@ class URLerHandler(randomizer.handler.Handler):
     @tornado.gen.coroutine
     def post(self):
         # URLize shit
-        l = yield Link.objects.get(url=self.get_argument('url'))
+        url = self.get_argument('url')
+        if not url.startswith('http://') or not url.startswith('https://'):
+            url = 'http://%s' % url
+        l = yield Link.objects.get(url=url)
         if not l:
             n = random.choice(_worder.nouns)
             a = random.choice(_worder.adjs)
@@ -27,7 +30,7 @@ class URLerHandler(randomizer.handler.Handler):
                 a = random.choice(_worder.adjs)
 
             l = yield Link.objects.create(
-                url=self.get_argument('url'),
+                url=url,
                 noun=n,
                 adjective=a,
             )
