@@ -16,7 +16,7 @@ class URLerHandler(randomizer.handler.Handler):
     def post(self):
         # URLize shit
         url = self.get_argument('url')
-        if not url.startswith('http://') or not url.startswith('https://'):
+        if not url.startswith('http://') and not url.startswith('https://'):
             url = 'http://%s' % url
         l = yield Link.objects.get(url=url)
         if not l:
